@@ -67,10 +67,10 @@ index ee01b7f..1bed518 100644
  	<key>NSFaceIDUsageDescription</key>
 diff --git a/Loop/Loop/Managers/ContactGlucoseImageManager.swift b/Loop/Loop/Managers/ContactGlucoseImageManager.swift
 new file mode 100644
-index 0000000..1d61f51
+index 0000000..9bbc1fb
 --- /dev/null
 +++ b/Loop/Loop/Managers/ContactGlucoseImageManager.swift
-@@ -0,0 +1,177 @@
+@@ -0,0 +1,173 @@
 +import Combine
 +import Contacts
 +import LoopKit
@@ -200,14 +200,10 @@ index 0000000..1d61f51
 +                ])
 +            }
 +            draw("\(glucose) \(trend)", y: 135, size: 112)
-+            draw(unit, y: 252, size: 28)
 +            let time = DateFormatter()
 +            time.timeStyle = .short
 +            // Use the sample timestamp, not Date(), so an old reading is never relabeled fresh.
 +            draw(time.string(from: date), y: 300, size: 64, width: 370)
-+            let day = DateFormatter()
-+            day.setLocalizedDateFormatFromTemplate("MMM d")
-+            draw(day.string(from: date), y: 378, size: 30, width: 280)
 +        }.pngData()
 +    }
 +}
@@ -264,7 +260,7 @@ index 3c9d61c..c2487f4 100644
  
 diff --git a/Loop/Loop/Views/ContactGlucoseImageSettingsView.swift b/Loop/Loop/Views/ContactGlucoseImageSettingsView.swift
 new file mode 100644
-index 0000000..5e9da38
+index 0000000..11b2d1a
 --- /dev/null
 +++ b/Loop/Loop/Views/ContactGlucoseImageSettingsView.swift
 @@ -0,0 +1,86 @@
@@ -291,7 +287,7 @@ index 0000000..5e9da38
 +                ))
 +                .disabled(manager.contactName.isEmpty)
 +            }
-+            Section(header: Text("Status"), footer: Text("Shows glucose, trend, units, and a large reading time. The date helps identify old readings. Updates depend on Loop receiving glucose and iOS allowing contact writes; the photo can be stale. Turning this off leaves the last photo in place.")) {
++            Section(header: Text("Status"), footer: Text("Shows glucose, trend, and a large reading time, without units or a calendar date. Updates depend on Loop receiving glucose and iOS allowing contact writes; the photo can be stale. Turning this off leaves the last photo in place.")) {
 +                Text(manager.status)
 +                if let accessError { Text(accessError).foregroundColor(.red) }
 +            }

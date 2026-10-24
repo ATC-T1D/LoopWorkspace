@@ -21,8 +21,8 @@ this replaces its existing photo and may sync the glucose image through the
 contact account (for example, iCloud). Disabling or changing contacts leaves
 the last photo on the previous contact; it does not restore the original.
 
-The image has a glucose value, reported trend (a dash if unavailable), display
-units, a large localized reading time, and a date. LOW/HIGH sensor conditions
+The image has a glucose value, reported trend (a dash if unavailable), and a
+large localized reading time. Units and the calendar date are not drawn. LOW/HIGH sensor conditions
 are preserved. It uses the glucose measurement timestamp, not the write time.
 The first update follows a glucose-store notification (or enabling after one
 has already arrived during this app session). Unit changes appear with the
@@ -37,7 +37,8 @@ may finish. Contact errors appear in this settings screen, not as therapy alerts
 
 Background execution and contact-photo propagation are controlled by iOS.
 The image can remain stale indefinitely if readings stop or writes fail.
-Check its date/time; it is not a live glucose widget or a dosing input.
+The time alone cannot identify a reading from a previous day; check freshness
+in Loop. It is not a live glucose widget or a dosing input.
 
 ## Verification
 
@@ -61,12 +62,13 @@ or TestFlight release was triggered.
 3. Full and iOS 18+ limited access: selected accessible editable contact updates;
    inaccessible/deleted/read-only contacts show an error without affecting Loop.
 4. Verify mg/dL and mmol/L, all reported arrows, unknown trend, LOW/HIGH, 12/24-hour
-   time, and circular cropping (including long localized time strings).
+   time, and circular cropping (including long localized time strings). Confirm
+   that the units label and calendar date are absent.
 5. Deliver older backfill and repeated samples: photo must not regress to an
    older reading; repeated identical content should not cause another save.
 6. Disable, change contact, cancel selection, relaunch, revoke permission:
    verify opt-in persistence and that unrelated contacts are untouched.
-7. Stop readings: photo must retain the original measurement date/time.
+7. Stop readings: photo must retain the original measurement time.
 8. Receive readings in the background and check propagation to the intended
    device/contact-photo surface; do not infer this from a successful foreground save.
 
