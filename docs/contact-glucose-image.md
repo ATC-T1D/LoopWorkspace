@@ -21,7 +21,7 @@ this replaces its existing photo and may sync the glucose image through the
 contact account (for example, iCloud). Disabling or changing contacts leaves
 the last photo on the previous contact; it does not restore the original.
 
-The image has a glucose value, reported trend (a dash if unavailable), and a
+The image has a glucose value, reported trend (omitted if unavailable), and a
 large localized reading time. Units and the calendar date are not drawn. LOW/HIGH sensor conditions
 are preserved. It uses the glucose measurement timestamp, not the write time.
 The first update follows a glucose-store notification (or enabling after one
@@ -39,6 +39,19 @@ Background execution and contact-photo propagation are controlled by iOS.
 The image can remain stale indefinitely if readings stop or writes fail.
 The time alone cannot identify a reading from a previous day; check freshness
 in Loop. It is not a live glucose widget or a dosing input.
+
+## xDrip layout parity
+
+Matches the timestamp-enabled renderer in ATC-T1D/xdripswift at `5a5fa47`
+(also present on master when checked). Uses the same SwiftUI Canvas and
+ImageRenderer at scale 1: 256×256, centered glucose at y=80 with an arrow or
+110 without, bold arrow 54pt at y=150, and monospaced-digit semibold time
+34pt at y=204, uniformly scaled to a maximum 160pt width. Glucose uses xDrip's
+unit/value-dependent bold font sizes capped at 86pt with an arrow or 110pt
+without, including -0.025 tracking. Missing trends omit the arrow like xDrip.
+Loop retains its white-on-black colors and LOW/HIGH text; this matches layout
+and typography, not xDrip's range coloring or freshness policy. SwiftUI renders
+on the main actor; contact fetch/save still runs on the serial utility queue.
 
 ## Verification
 

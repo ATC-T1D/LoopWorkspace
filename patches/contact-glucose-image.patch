@@ -67,16 +67,17 @@ index ee01b7f..1bed518 100644
  	<key>NSFaceIDUsageDescription</key>
 diff --git a/Loop/Loop/Managers/ContactGlucoseImageManager.swift b/Loop/Loop/Managers/ContactGlucoseImageManager.swift
 new file mode 100644
-index 0000000..9bbc1fb
+index 0000000..f1441da
 --- /dev/null
 +++ b/Loop/Loop/Managers/ContactGlucoseImageManager.swift
-@@ -0,0 +1,173 @@
+@@ -0,0 +1,220 @@
 +import Combine
 +import Contacts
 +import LoopKit
 +import LoopAlgorithm
 +import LoopKitUI
 +import UIKit
++import SwiftUI
 +
 +/// A display-only integration. Contact I/O never runs on the dosing/main actor.
 +@MainActor
@@ -152,8 +153,9 @@ index 0000000..9bbc1fb
 +        }
 +        let content = ContactGlucoseImageContent(
 +            glucose: glucose,
-+            trend: (sample as? StoredGlucoseSample)?.trend?.symbol ?? "–",
-+            unit: preference.unit.shortLocalizedUnitString(),
++            trend: (sample as? StoredGlucoseSample)?.trend?.symbol ?? "",
++            value: sample.quantity.doubleValue(for: preference.unit),
++            isMgDl: preference.unit == .milligramsPerDeciliter,
 +            date: sample.startDate
 +        )
 +        latest = content
@@ -161,9 +163,14 @@ index 0000000..9bbc1fb
 +    }
 +
 +    private func submit(_ content: ContactGlucoseImageContent) {
++        // SwiftUI ImageRenderer requires the main actor; Contacts I/O remains off-main.
++        guard let data = content.pngData() else {
++            status = "Unable to create contact photo."
++            return
++        }
 +        let generation = self.generation
 +        queue.async { [writer, weak self] in
-+            let result = writer.write(content)
++            let result = writer.write(content, data: data)
 +            DispatchQueue.main.async { [weak self] in
 +                guard let self, self.generation == generation else { return }
 +                if let result { self.status = result }
@@ -175,36 +182,77 @@ index 0000000..9bbc1fb
 +struct ContactGlucoseImageContent: Equatable {
 +    let glucose: String
 +    let trend: String
-+    let unit: String
++    let value: Double
++    let isMgDl: Bool
 +    let date: Date
 +
++    @MainActor
 +    func pngData() -> Data? {
-+        let format = UIGraphicsImageRendererFormat()
-+        format.scale = 1
-+        format.opaque = true
-+        let renderer = UIGraphicsImageRenderer(size: CGSize(width: 512, height: 512), format: format)
-+        return renderer.image { context in
-+            UIColor.black.setFill()
-+            context.fill(CGRect(x: 0, y: 0, width: 512, height: 512))
-+            func draw(_ text: String, y: CGFloat, size: CGFloat, width: CGFloat = 400) {
-+                var fontSize = size
-+                while fontSize > 20 && (text as NSString).size(withAttributes: [
-+                    .font: UIFont.boldSystemFont(ofSize: fontSize)
-+                ]).width > width { fontSize -= 1 }
-+                let paragraph = NSMutableParagraphStyle()
-+                paragraph.alignment = .center
-+                (text as NSString).draw(in: CGRect(x: (512 - width) / 2, y: y, width: width, height: fontSize * 1.5), withAttributes: [
-+                    .font: UIFont.boldSystemFont(ofSize: fontSize),
-+                    .foregroundColor: UIColor.white,
-+                    .paragraphStyle: paragraph
-+                ])
++        let renderer = ImageRenderer(content: ContactGlucoseImageView(content: self))
++        renderer.scale = 1
++        return renderer.uiImage?.pngData()
++    }
++}
++
++/// Typography and geometry match xDrip's timestamp-enabled contact image.
++private struct ContactGlucoseImageView: View {
++    let content: ContactGlucoseImageContent
++
++    private var showsSlopeArrow: Bool { !content.trend.isEmpty }
++
++    private var glucoseFontSize: CGFloat {
++        let size: CGFloat
++        if content.isMgDl {
++            switch content.value {
++            case 1..<100: size = showsSlopeArrow ? 120 : 130
++            case 100..<200: size = showsSlopeArrow ? 95 : 105
++            default: size = showsSlopeArrow ? 90 : 100
 +            }
-+            draw("\(glucose) \(trend)", y: 135, size: 112)
-+            let time = DateFormatter()
-+            time.timeStyle = .short
-+            // Use the sample timestamp, not Date(), so an old reading is never relabeled fresh.
-+            draw(time.string(from: date), y: 300, size: 64, width: 370)
-+        }.pngData()
++        } else {
++            switch content.value {
++            case 0.1..<10: size = showsSlopeArrow ? 100 : 110
++            case 10..<20: size = showsSlopeArrow ? 80 : 90
++            default: size = showsSlopeArrow ? 80 : 85
++            }
++        }
++        return min(size, showsSlopeArrow ? 86 : 110)
++    }
++
++    var body: some View {
++        Canvas { context, size in
++            context.fill(Path(CGRect(origin: .zero, size: size)), with: .color(.black))
++            let value = context.resolve(
++                Text(content.glucose)
++                    .font(.system(size: glucoseFontSize, weight: .bold))
++                    .foregroundColor(.white)
++                    .tracking(-0.025)
++            )
++            context.draw(value, at: CGPoint(x: size.width / 2, y: showsSlopeArrow ? 80 : 110), anchor: .center)
++
++            if showsSlopeArrow {
++                let arrow = context.resolve(
++                    Text(content.trend)
++                        .font(.system(size: 54, weight: .bold))
++                        .foregroundColor(.white)
++                )
++                context.draw(arrow, at: CGPoint(x: size.width / 2, y: 150), anchor: .center)
++            }
++
++            // Use the measurement time, never the render time. No date or units label.
++            let timestamp = context.resolve(
++                Text(content.date.formatted(date: .omitted, time: .shortened))
++                    .font(.system(size: 34, weight: .semibold))
++                    .monospacedDigit()
++                    .foregroundColor(.white)
++            )
++            let timestampSize = timestamp.measure(in: CGSize(width: 1024, height: 64))
++            let scale = min(1, 160 / max(timestampSize.width, 1))
++            var timestampContext = context
++            timestampContext.translateBy(x: size.width / 2, y: 204)
++            timestampContext.scaleBy(x: scale, y: scale)
++            timestampContext.draw(timestamp, at: .zero, anchor: .center)
++        }
++        .frame(width: 256, height: 256)
 +    }
 +}
 +
@@ -221,7 +269,7 @@ index 0000000..9bbc1fb
 +        self.enabled = enabled
 +    }
 +
-+    func write(_ content: ContactGlucoseImageContent) -> String? {
++    func write(_ content: ContactGlucoseImageContent, data: Data) -> String? {
 +        guard enabled, !identifier.isEmpty, content != lastWritten else { return nil }
 +        do {
 +            // Fetch afresh: preserve all other contact fields and never create duplicates.
@@ -229,8 +277,7 @@ index 0000000..9bbc1fb
 +                CNContactIdentifierKey as CNKeyDescriptor,
 +                CNContactImageDataKey as CNKeyDescriptor
 +            ])
-+            guard let mutable = contact.mutableCopy() as? CNMutableContact,
-+                  let data = content.pngData() else {
++            guard let mutable = contact.mutableCopy() as? CNMutableContact else {
 +                return "Unable to create contact photo."
 +            }
 +            mutable.imageData = data
