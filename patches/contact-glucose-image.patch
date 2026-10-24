@@ -1,0 +1,373 @@
+diff --git a/Loop/Loop.xcodeproj/project.pbxproj b/Loop/Loop.xcodeproj/project.pbxproj
+index 05301b2..3d712c9 100644
+--- a/Loop/Loop.xcodeproj/project.pbxproj
++++ b/Loop/Loop.xcodeproj/project.pbxproj
+@@ -657,6 +657,8 @@
+ 		FEEDB0000000000000000004 /* Statistics/TimeInRangeBar.swift in Sources */ = {isa = PBXBuildFile; fileRef = FEEDF0000000000000000004 /* Statistics/TimeInRangeBar.swift */; };
+ 		30E4A68B8C914C5E4B245555 /* InsulinDeliveryHistoryTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = F69CE2EE3714858772FE7A26 /* InsulinDeliveryHistoryTests.swift */; };
+ 		FEEDB0000000000000000005 /* GlucoseStatisticsTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = FEEDF0000000000000000005 /* GlucoseStatisticsTests.swift */; };
++		C061AC710000000000000002 /* ContactGlucoseImageManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = C061AC710000000000000001 /* ContactGlucoseImageManager.swift */; };
++		C061AC710000000000000004 /* ContactGlucoseImageSettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C061AC710000000000000003 /* ContactGlucoseImageSettingsView.swift */; };
+ /* End PBXBuildFile section */
+ 
+ /* Begin PBXContainerItemProxy section */
+@@ -1466,6 +1468,8 @@
+ 		FEEDF0000000000000000004 /* Statistics/TimeInRangeBar.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Statistics/TimeInRangeBar.swift; sourceTree = "<group>"; };
+ 		F69CE2EE3714858772FE7A26 /* InsulinDeliveryHistoryTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InsulinDeliveryHistoryTests.swift; sourceTree = "<group>"; };
+ 		FEEDF0000000000000000005 /* GlucoseStatisticsTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GlucoseStatisticsTests.swift; sourceTree = "<group>"; };
++		C061AC710000000000000001 /* ContactGlucoseImageManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContactGlucoseImageManager.swift; sourceTree = "<group>"; };
++		C061AC710000000000000003 /* ContactGlucoseImageSettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContactGlucoseImageSettingsView.swift; sourceTree = "<group>"; };
+ /* End PBXFileReference section */
+ 
+ /* Begin PBXFrameworksBuildPhase section */
+@@ -2057,6 +2061,7 @@
+ 				B43B5C532EAFBF110096A6AE /* RecentGlucoseTableViewCell.xib */,
+ 				C151634D2FA2C9C800FEECE8 /* RequiredVersionUpdateView.swift */,
+ 				1DE09BA824A3E23F009EE9F9 /* SettingsView.swift */,
++				C061AC710000000000000003 /* ContactGlucoseImageSettingsView.swift */,
+ 				FEEDF0000000000000000004 /* Statistics/TimeInRangeBar.swift */,
+ 				747DA22B61531CCAAC79E86D /* Statistics/DailyInsulinChartView.swift */,
+ 				FEEDF0000000000000000003 /* Statistics/AGPChartView.swift */,
+@@ -2091,6 +2096,7 @@
+ 				A977A2F324ACFECF0059C207 /* CriticalEventLogExportManager.swift */,
+ 				C148CEE624FD91BD00711B3B /* DeliveryUncertaintyAlertManager.swift */,
+ 				43DBF0521C93EC8200B3C386 /* DeviceDataManager.swift */,
++				C061AC710000000000000001 /* ContactGlucoseImageManager.swift */,
+ 				C16B983D26B4893300256B05 /* DoseEnactor.swift */,
+ 				4F70C20F1DE8FAC5006380B7 /* ExtensionDataManager.swift */,
+ 				A9C62D862331703000535612 /* LoggingServicesManager.swift */,
+@@ -3485,6 +3491,7 @@
+ 				A9CBE45A248ACBE1008E7BA2 /* DosingDecisionStore+SimulatedCoreData.swift in Sources */,
+ 				A9C62D8A2331703100535612 /* ServicesManager.swift in Sources */,
+ 				43DBF0531C93EC8200B3C386 /* DeviceDataManager.swift in Sources */,
++				C061AC710000000000000002 /* ContactGlucoseImageManager.swift in Sources */,
+ 				A9347F2F24E7508A00C99C34 /* WatchHistoricalCarbs.swift in Sources */,
+ 				C10509792D8B636900118A37 /* Environment+TemporaryPresetsManager.swift in Sources */,
+ 				A9B996F027235191002DC09C /* LoopWarning.swift in Sources */,
+@@ -3599,6 +3606,7 @@
+ 				1D12D3B92548EFDD00B53E8B /* main.swift in Sources */,
+ 				A9DCF32A25B0FABF00C89088 /* LoopUIColorPalette+Default.swift in Sources */,
+ 				1DDE273E24AEA4B000796622 /* SettingsView.swift in Sources */,
++				C061AC710000000000000004 /* ContactGlucoseImageSettingsView.swift in Sources */,
+ 				FEEDB0000000000000000004 /* Statistics/TimeInRangeBar.swift in Sources */,
+ 				A3C9F155FD92DC188BD9A21F /* Statistics/DailyInsulinChartView.swift in Sources */,
+ 				FEEDB0000000000000000003 /* Statistics/AGPChartView.swift in Sources */,
+diff --git a/Loop/Loop/Info.plist b/Loop/Loop/Info.plist
+index ee01b7f..1bed518 100644
+--- a/Loop/Loop/Info.plist
++++ b/Loop/Loop/Info.plist
+@@ -66,6 +66,8 @@
+ 	<string>The app needs to use Bluetooth to send and receive data from your diabetes devices.</string>
+ 	<key>NSBluetoothPeripheralUsageDescription</key>
+ 	<string>The app needs to use Bluetooth to send and receive data from your diabetes devices.</string>
++	<key>NSContactsUsageDescription</key>
++	<string>Loop can update a contact photo you choose with your glucose, trend, and reading time.</string>
+ 	<key>NSCameraUsageDescription</key>
+ 	<string>Camera is used to scan barcodes of devices.</string>
+ 	<key>NSFaceIDUsageDescription</key>
+diff --git a/Loop/Loop/Managers/ContactGlucoseImageManager.swift b/Loop/Loop/Managers/ContactGlucoseImageManager.swift
+new file mode 100644
+index 0000000..1d61f51
+--- /dev/null
++++ b/Loop/Loop/Managers/ContactGlucoseImageManager.swift
+@@ -0,0 +1,177 @@
++import Combine
++import Contacts
++import LoopKit
++import LoopAlgorithm
++import LoopKitUI
++import UIKit
++
++/// A display-only integration. Contact I/O never runs on the dosing/main actor.
++@MainActor
++final class ContactGlucoseImageManager: ObservableObject {
++    static let shared = ContactGlucoseImageManager()
++    private enum Key {
++        static let enabled = "ContactGlucoseImage.enabled"
++        static let identifier = "ContactGlucoseImage.identifier"
++        static let name = "ContactGlucoseImage.name"
++    }
++
++    @Published private(set) var enabled: Bool
++    @Published private(set) var contactName: String
++    @Published private(set) var status = "Waiting for a glucose reading."
++    private var identifier: String
++    private var latest: ContactGlucoseImageContent?
++    private let queue = DispatchQueue(label: "com.Loop.contact-glucose-image", qos: .utility)
++    private let writer = ContactGlucoseImageWriter()
++    private var generation = 0
++
++    private init() {
++        let defaults = UserDefaults.standard
++        identifier = defaults.string(forKey: Key.identifier) ?? ""
++        contactName = defaults.string(forKey: Key.name) ?? ""
++        enabled = defaults.bool(forKey: Key.enabled) && !identifier.isEmpty
++        configureWriter()
++        if !enabled { status = "Updates off. Existing photo is unchanged." }
++    }
++
++    static var hasContactsAccess: Bool {
++        let authorization = CNContactStore.authorizationStatus(for: .contacts)
++        if #available(iOS 18.0, *), authorization == .limited { return true }
++        return authorization == .authorized
++    }
++
++    func selectContact(identifier: String, name: String) {
++        setEnabled(false)
++        self.identifier = identifier
++        contactName = name
++        UserDefaults.standard.set(identifier, forKey: Key.identifier)
++        UserDefaults.standard.set(name, forKey: Key.name)
++        configureWriter()
++        status = "Contact selected. Enable to replace its photo."
++    }
++
++    func setEnabled(_ value: Bool) {
++        enabled = value && !identifier.isEmpty && Self.hasContactsAccess
++        UserDefaults.standard.set(enabled, forKey: Key.enabled)
++        configureWriter()
++        status = enabled ? "Waiting for a glucose reading." : "Updates off. Existing photo is unchanged."
++        if value && !Self.hasContactsAccess {
++            status = "Allow Contacts access in iOS Settings, then try again."
++        }
++        if enabled, let latest { submit(latest) }
++    }
++
++    private func configureWriter() {
++        generation += 1
++        let identifier = self.identifier
++        let enabled = self.enabled
++        queue.async { [writer] in writer.configure(identifier: identifier, enabled: enabled) }
++    }
++
++    func update(sample: GlucoseSampleValue, preference: DisplayGlucosePreference) {
++        // Never replace a newer reading with backfill or a future-dated sample.
++        guard sample.startDate <= Date(),
++              sample.startDate >= (latest?.date ?? .distantPast) else { return }
++        let glucose: String
++        switch sample.condition {
++        case .belowRange?: glucose = "LOW"
++        case .aboveRange?: glucose = "HIGH"
++        case nil: glucose = preference.format(sample.quantity, includeUnit: false)
++        }
++        let content = ContactGlucoseImageContent(
++            glucose: glucose,
++            trend: (sample as? StoredGlucoseSample)?.trend?.symbol ?? "–",
++            unit: preference.unit.shortLocalizedUnitString(),
++            date: sample.startDate
++        )
++        latest = content
++        if enabled { submit(content) }
++    }
++
++    private func submit(_ content: ContactGlucoseImageContent) {
++        let generation = self.generation
++        queue.async { [writer, weak self] in
++            let result = writer.write(content)
++            DispatchQueue.main.async { [weak self] in
++                guard let self, self.generation == generation else { return }
++                if let result { self.status = result }
++            }
++        }
++    }
++}
++
++struct ContactGlucoseImageContent: Equatable {
++    let glucose: String
++    let trend: String
++    let unit: String
++    let date: Date
++
++    func pngData() -> Data? {
++        let format = UIGraphicsImageRendererFormat()
++        format.scale = 1
++        format.opaque = true
++        let renderer = UIGraphicsImageRenderer(size: CGSize(width: 512, height: 512), format: format)
++        return renderer.image { context in
++            UIColor.black.setFill()
++            context.fill(CGRect(x: 0, y: 0, width: 512, height: 512))
++            func draw(_ text: String, y: CGFloat, size: CGFloat, width: CGFloat = 400) {
++                var fontSize = size
++                while fontSize > 20 && (text as NSString).size(withAttributes: [
++                    .font: UIFont.boldSystemFont(ofSize: fontSize)
++                ]).width > width { fontSize -= 1 }
++                let paragraph = NSMutableParagraphStyle()
++                paragraph.alignment = .center
++                (text as NSString).draw(in: CGRect(x: (512 - width) / 2, y: y, width: width, height: fontSize * 1.5), withAttributes: [
++                    .font: UIFont.boldSystemFont(ofSize: fontSize),
++                    .foregroundColor: UIColor.white,
++                    .paragraphStyle: paragraph
++                ])
++            }
++            draw("\(glucose) \(trend)", y: 135, size: 112)
++            draw(unit, y: 252, size: 28)
++            let time = DateFormatter()
++            time.timeStyle = .short
++            // Use the sample timestamp, not Date(), so an old reading is never relabeled fresh.
++            draw(time.string(from: date), y: 300, size: 64, width: 370)
++            let day = DateFormatter()
++            day.setLocalizedDateFormatFromTemplate("MMM d")
++            draw(day.string(from: date), y: 378, size: 30, width: 280)
++        }.pngData()
++    }
++}
++
++/// All methods/state are confined to the manager's serial utility queue.
++private final class ContactGlucoseImageWriter {
++    private let store = CNContactStore()
++    private var identifier = ""
++    private var enabled = false
++    private var lastWritten: ContactGlucoseImageContent?
++
++    func configure(identifier: String, enabled: Bool) {
++        if self.identifier != identifier || self.enabled != enabled { lastWritten = nil }
++        self.identifier = identifier
++        self.enabled = enabled
++    }
++
++    func write(_ content: ContactGlucoseImageContent) -> String? {
++        guard enabled, !identifier.isEmpty, content != lastWritten else { return nil }
++        do {
++            // Fetch afresh: preserve all other contact fields and never create duplicates.
++            let contact = try store.unifiedContact(withIdentifier: identifier, keysToFetch: [
++                CNContactIdentifierKey as CNKeyDescriptor,
++                CNContactImageDataKey as CNKeyDescriptor
++            ])
++            guard let mutable = contact.mutableCopy() as? CNMutableContact,
++                  let data = content.pngData() else {
++                return "Unable to create contact photo."
++            }
++            mutable.imageData = data
++            let request = CNSaveRequest()
++            request.update(mutable)
++            try store.execute(request)
++            lastWritten = content // Failed writes remain retryable on the next reading.
++            return "Photo updated. Timestamp shows when glucose was measured."
++        } catch {
++            return "Photo update failed. Check Contacts access and that the selected contact is editable."
++        }
++    }
++}
+diff --git a/Loop/Loop/Managers/DeviceDataManager.swift b/Loop/Loop/Managers/DeviceDataManager.swift
+index 3c9d61c..c2487f4 100644
+--- a/Loop/Loop/Managers/DeviceDataManager.swift
++++ b/Loop/Loop/Managers/DeviceDataManager.swift
+@@ -1262,6 +1262,9 @@ extension DeviceDataManager: DosingDecisionStoreDelegate {
+ extension DeviceDataManager: GlucoseStoreDelegate {
+     func glucoseStoreHasUpdatedGlucoseData(_ glucoseStore: GlucoseStore) {
+         uploadEventListener.triggerUpload(for: .glucose)
++        if let sample = glucoseStore.latestGlucose {
++            ContactGlucoseImageManager.shared.update(sample: sample, preference: displayGlucosePreference)
++        }
+     }
+ }
+ 
+diff --git a/Loop/Loop/Views/ContactGlucoseImageSettingsView.swift b/Loop/Loop/Views/ContactGlucoseImageSettingsView.swift
+new file mode 100644
+index 0000000..5e9da38
+--- /dev/null
++++ b/Loop/Loop/Views/ContactGlucoseImageSettingsView.swift
+@@ -0,0 +1,86 @@
++import Contacts
++import ContactsUI
++import SwiftUI
++
++struct ContactGlucoseImageSettingsView: View {
++    @ObservedObject private var manager = ContactGlucoseImageManager.shared
++    @State private var showingPicker = false
++    @State private var requestingAccess = false
++    @State private var accessError: String?
++
++    var body: some View {
++        Form {
++            Section(footer: Text("This replaces the selected contact’s photo. Use a dedicated contact. The photo may sync to your other devices and contact services.")) {
++                Button(manager.contactName.isEmpty ? "Choose Contact" : "Contact: \(manager.contactName)") {
++                    chooseContact()
++                }
++                .disabled(requestingAccess)
++                Toggle("Update Contact Photo", isOn: Binding(
++                    get: { manager.enabled },
++                    set: { manager.setEnabled($0) }
++                ))
++                .disabled(manager.contactName.isEmpty)
++            }
++            Section(header: Text("Status"), footer: Text("Shows glucose, trend, units, and a large reading time. The date helps identify old readings. Updates depend on Loop receiving glucose and iOS allowing contact writes; the photo can be stale. Turning this off leaves the last photo in place.")) {
++                Text(manager.status)
++                if let accessError { Text(accessError).foregroundColor(.red) }
++            }
++        }
++        .navigationTitle("Contact Image")
++        .sheet(isPresented: $showingPicker) {
++            ContactGlucosePicker { contact in
++                if let contact {
++                    let name = CNContactFormatter.string(from: contact, style: .fullName) ?? "Selected Contact"
++                    manager.selectContact(identifier: contact.identifier, name: name)
++                }
++                showingPicker = false
++            }
++        }
++    }
++
++    private func chooseContact() {
++        // Changing contacts requires explicitly enabling updates again.
++        manager.setEnabled(false)
++        accessError = nil
++        if ContactGlucoseImageManager.hasContactsAccess {
++            showingPicker = true
++        } else if CNContactStore.authorizationStatus(for: .contacts) == .notDetermined {
++            requestingAccess = true
++            CNContactStore().requestAccess(for: .contacts) { _, _ in
++                DispatchQueue.main.async {
++                    requestingAccess = false
++                    if ContactGlucoseImageManager.hasContactsAccess {
++                        showingPicker = true
++                    } else {
++                        accessError = "Allow Contacts access in iOS Settings to use this feature."
++                    }
++                }
++            }
++        } else {
++            accessError = "Allow Contacts access in iOS Settings to use this feature."
++        }
++    }
++}
++
++private struct ContactGlucosePicker: UIViewControllerRepresentable {
++    let onSelection: (CNContact?) -> Void
++
++    func makeCoordinator() -> Coordinator { Coordinator(onSelection: onSelection) }
++
++    func makeUIViewController(context: Context) -> CNContactPickerViewController {
++        let picker = CNContactPickerViewController()
++        picker.delegate = context.coordinator
++        return picker
++    }
++
++    func updateUIViewController(_ controller: CNContactPickerViewController, context: Context) {}
++
++    final class Coordinator: NSObject, CNContactPickerDelegate {
++        let onSelection: (CNContact?) -> Void
++        init(onSelection: @escaping (CNContact?) -> Void) { self.onSelection = onSelection }
++        func contactPicker(_ picker: CNContactPickerViewController, didSelect contact: CNContact) {
++            onSelection(contact)
++        }
++        func contactPickerDidCancel(_ picker: CNContactPickerViewController) { onSelection(nil) }
++    }
++}
+diff --git a/Loop/Loop/Views/SettingsView.swift b/Loop/Loop/Views/SettingsView.swift
+index 1faefbc..2bd6216 100644
+--- a/Loop/Loop/Views/SettingsView.swift
++++ b/Loop/Loop/Views/SettingsView.swift
+@@ -110,6 +110,12 @@ struct SettingsView: View {
+                         item.view
+                     }
+ 
++                    Section {
++                        NavigationLink(destination: ContactGlucoseImageSettingsView()) {
++                            Text("Contact Image")
++                        }
++                    }
++
+                     supportSection
+ 
+                     if let profileExpiration = BuildDetails.default.profileExpiration, FeatureFlags.profileExpirationSettingsViewEnabled {
