@@ -52,7 +52,7 @@ index 19db482..f11526f 100644
 --- a/Loop/Loop/Managers/DeviceDataManager.swift
 +++ b/Loop/Loop/Managers/DeviceDataManager.swift
 @@ -6,6 +6,7 @@
- //  Copyright Â© 2015 Nathan Racklyeft. All rights reserved.
+ //  Copyright © 2015 Nathan Racklyeft. All rights reserved.
  //
  
 +import UIKit
@@ -183,7 +183,7 @@ index 0000000..4358f60
 +            case .aboveRange: return "HIGH"
 +            case nil: return deviceManager.displayGlucosePreference.format(reading.quantity, includeUnit: false)
 +            }
-+        } ?? (enabled ? "â€”" : "OFF")
++        } ?? (enabled ? "—" : "OFF")
 +        let range = deviceManager.glucoseDisplay(for: sample)?.glucoseRangeCategory
 +        let color: Color
 +        if !fresh { color = .gray }
@@ -201,7 +201,7 @@ index 0000000..4358f60
 +        let renderer = ImageRenderer(content: GlucoseContactPhoto(value: value, arrow: arrow, timestamp: timestamp, color: color))
 +        guard let data = renderer.uiImage?.pngData() else { return }
 +        let source = deviceManager.cgmManager?.localizedTitle ?? "Loop"
-+        let detail = timestamp.map { "\(source) Â· \($0)" } ?? ""
++        let detail = timestamp.map { "\(source) · \($0)" } ?? ""
 +        let active = enabled
 +        let currentRevision = revision
 +        writes.async {
