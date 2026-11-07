@@ -1,0 +1,228 @@
+diff --git a/Loop/Loop.xcodeproj/project.pbxproj b/Loop/Loop.xcodeproj/project.pbxproj
+index a3099a4..912e8bd 100644
+--- a/Loop/Loop.xcodeproj/project.pbxproj
++++ b/Loop/Loop.xcodeproj/project.pbxproj
+@@ -272,6 +272,7 @@
+ 		43D9FFFB21EAF3D300AF44BF /* NSTimeInterval.swift in Sources */ = {isa = PBXBuildFile; fileRef = 439897341CD2F7DE00223065 /* NSTimeInterval.swift */; };
+ 		43DBF0531C93EC8200B3C386 /* DeviceDataManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 43DBF0521C93EC8200B3C386 /* DeviceDataManager.swift */; };
+ 		C017AC700000000000000002 /* GlucoseContact.swift in Sources */ = {isa = PBXBuildFile; fileRef = C017AC700000000000000001 /* GlucoseContact.swift */; };
++		BAD6E7000000000000000002 /* GlucoseIconBadge.swift in Sources */ = {isa = PBXBuildFile; fileRef = BAD6E7000000000000000001 /* GlucoseIconBadge.swift */; };
+ 		43DFB62320D4CAE7008A7BAE /* PumpManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 43C3B6F620BBCAA30026CAFA /* PumpManager.swift */; };
+ 		43E3449F1B9D68E900C85C07 /* StatusTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 43E3449E1B9D68E900C85C07 /* StatusTableViewController.swift */; };
+ 		43E93FB61E469A4000EAB8DB /* NumberFormatter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 43BFF0B31E45C1BE00FF19A9 /* NumberFormatter.swift */; };
+@@ -1093,6 +1094,7 @@
+ 		43D9FFD221EAE05D00AF44BF /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+ 		43DBF0521C93EC8200B3C386 /* DeviceDataManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; lineEnding = 0; path = DeviceDataManager.swift; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.swift; };
+ 		C017AC700000000000000001 /* GlucoseContact.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; lineEnding = 0; path = GlucoseContact.swift; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.swift; };
++		BAD6E7000000000000000001 /* GlucoseIconBadge.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; lineEnding = 0; path = GlucoseIconBadge.swift; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.swift; };
+ 		43DE92581C5479E4001FFDE1 /* GetBolusRecommendationUserInfo.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = GetBolusRecommendationUserInfo.swift; sourceTree = "<group>"; };
+ 		43E2D90B1D20C581004DA55F /* LoopTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = LoopTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+ 		43E2D90F1D20C581004DA55F /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+@@ -2292,6 +2294,7 @@
+ 				C148CEE624FD91BD00711B3B /* DeliveryUncertaintyAlertManager.swift */,
+ 				43DBF0521C93EC8200B3C386 /* DeviceDataManager.swift */,
+ 				C017AC700000000000000001 /* GlucoseContact.swift */,
++				BAD6E7000000000000000001 /* GlucoseIconBadge.swift */,
+ 				C16B983D26B4893300256B05 /* DoseEnactor.swift */,
+ 				4F70C20F1DE8FAC5006380B7 /* ExtensionDataManager.swift */,
+ 				A9C62D862331703000535612 /* LoggingServicesManager.swift */,
+@@ -3790,6 +3793,7 @@
+ 				A9C62D8A2331703100535612 /* ServicesManager.swift in Sources */,
+ 				43DBF0531C93EC8200B3C386 /* DeviceDataManager.swift in Sources */,
+ 				C017AC700000000000000002 /* GlucoseContact.swift in Sources */,
++				BAD6E7000000000000000002 /* GlucoseIconBadge.swift in Sources */,
+ 				A9347F2F24E7508A00C99C34 /* WatchHistoricalCarbs.swift in Sources */,
+ 				C10509792D8B636900118A37 /* Environment+TemporaryPresetsManager.swift in Sources */,
+ 				C17824A01E19CF9800D9D25C /* GlucoseThresholdTableViewController.swift in Sources */,
+diff --git a/Loop/Loop/Managers/DeviceDataManager.swift b/Loop/Loop/Managers/DeviceDataManager.swift
+index f11526f..037b13e 100644
+--- a/Loop/Loop/Managers/DeviceDataManager.swift
++++ b/Loop/Loop/Managers/DeviceDataManager.swift
+@@ -173,6 +173,7 @@ final class DeviceDataManager {
+     // MARK: Stores
+     let carbStore: CarbStore
+     let doseStore: DoseStore
++    let glucoseIconBadge = GlucoseIconBadge()
+     let glucoseContact = GlucoseContact()
+     let glucoseStore: GlucoseStore
+     
+@@ -313,13 +314,17 @@ final class DeviceDataManager {
+             await cgmStalenessMonitor.checkCGMStaleness()
+         }
+ 
++        glucoseIconBadge.deviceManager = self
+         glucoseContact.deviceManager = self
+         displayGlucosePreference.$formatter
+             .map { _ in () }
+             .merge(with: NotificationCenter.default.publisher(for: UIApplication.didBecomeActiveNotification).map { _ in () })
+             .merge(with: NotificationCenter.default.publisher(for: GlucoseStore.glucoseSamplesDidChange).map { _ in () })
+             .receive(on: DispatchQueue.main)
+-            .sink { [weak self] in self?.glucoseContact.refresh() }
++            .sink { [weak self] in
++                self?.glucoseContact.refresh()
++                self?.glucoseIconBadge.refresh()
++            }
+             .store(in: &cancellables)
+ 
+         setupPump()
+diff --git a/Loop/Loop/Managers/GlucoseIconBadge.swift b/Loop/Loop/Managers/GlucoseIconBadge.swift
+new file mode 100644
+index 0000000..53f4a5a
+--- /dev/null
++++ b/Loop/Loop/Managers/GlucoseIconBadge.swift
+@@ -0,0 +1,113 @@
++import LoopKit
++import LoopCore
++import SwiftUI
++import UserNotifications
++
++@MainActor
++final class GlucoseIconBadge: ObservableObject {
++    nonisolated static let expirationIdentifier = "Loop.GlucoseIconBadge.expiration"
++    private static let enabledKey = "GlucoseIconBadge.enabled"
++    private static let cleanupKey = "GlucoseIconBadge.needsCleanup"
++
++    @Published private(set) var enabled = UserDefaults.standard.bool(forKey: enabledKey)
++    @Published private(set) var message: String?
++    weak var deviceManager: DeviceDataManager?
++    private let center = UNUserNotificationCenter.current()
++    private var updating = false
++    private var pending = false
++
++    func setEnabled(_ value: Bool) {
++        enabled = value
++        UserDefaults.standard.set(value, forKey: Self.enabledKey)
++        UserDefaults.standard.set(true, forKey: Self.cleanupKey)
++        refresh()
++    }
++
++    // Serialize notification-center writes. If another reading arrives during an
++    // await, process the latest state again after the current update finishes.
++    func refresh() {
++        guard enabled || UserDefaults.standard.bool(forKey: Self.cleanupKey) else { return }
++        pending = true
++        guard !updating else { return }
++        updating = true
++        Task {
++            while pending {
++                pending = false
++                do {
++                    try await update()
++                } catch {
++                    message = error.localizedDescription
++                }
++            }
++            updating = false
++        }
++    }
++
++    private func update() async throws {
++        if !enabled {
++            center.removePendingNotificationRequests(withIdentifiers: [Self.expirationIdentifier])
++            try await center.setBadgeCount(0)
++            if !enabled { UserDefaults.standard.removeObject(forKey: Self.cleanupKey) }
++            message = nil
++            return
++        }
++
++        var settings = await center.notificationSettings()
++        if settings.authorizationStatus == .notDetermined {
++            // Use Loop's existing notification options, including critical alerts when enabled.
++            await withCheckedContinuation { continuation in
++                NotificationManager.authorize { _ in continuation.resume() }
++            }
++            settings = await center.notificationSettings()
++        }
++        guard enabled else { return }
++        guard settings.badgeSetting == .enabled else {
++            center.removePendingNotificationRequests(withIdentifiers: [Self.expirationIdentifier])
++            message = NSLocalizedString("Turn on Badges for Loop in iOS Notification settings.", comment: "Glucose icon badge permission")
++            return
++        }
++        message = nil
++        guard let manager = deviceManager,
++              let reading = manager.glucoseStore.latestGlucose,
++              reading.condition == nil, !reading.isDisplayOnly,
++              reading.startDate <= Date() else {
++            try await clear()
++            return
++        }
++        let remaining = reading.startDate.addingTimeInterval(7 * 60).timeIntervalSinceNow
++        let unit = manager.displayGlucosePreference.unit
++        let value = reading.quantity.doubleValue(for: unit)
++        let count = (unit == .millimolesPerLiter ? value * 10 : value).rounded()
++        guard remaining >= 1, let badge = Int(exactly: count), badge > 0 else {
++            try await clear()
++            return
++        }
++
++        // The system can clear a stale reading even when Loop is suspended.
++        let content = UNMutableNotificationContent()
++        content.badge = 0
++        let trigger = UNTimeIntervalNotificationTrigger(timeInterval: remaining, repeats: false)
++        try await center.add(UNNotificationRequest(identifier: Self.expirationIdentifier, content: content, trigger: trigger))
++        guard enabled, !pending, reading.startDate.addingTimeInterval(7 * 60) > Date() else {
++            if !pending { try await clear() }
++            return
++        }
++        try await center.setBadgeCount(badge)
++    }
++
++    private func clear() async throws {
++        center.removePendingNotificationRequests(withIdentifiers: [Self.expirationIdentifier])
++        try await center.setBadgeCount(0)
++    }
++}
++
++struct GlucoseIconBadgeSettings: View {
++    @ObservedObject var badge: GlucoseIconBadge
++
++    var body: some View {
++        Section(footer: Text("Shows the latest glucose on the Loop app icon for seven minutes. The badge uses whole numbers: 105 mg/dL appears as 105, and 5.8 mmol/L appears as 58.")) {
++            Toggle("Glucose on App Icon", isOn: Binding(get: { badge.enabled }, set: badge.setEnabled))
++            if let message = badge.message { Text(message).font(.footnote) }
++        }
++    }
++}
+diff --git a/Loop/Loop/Managers/LoopAppManager.swift b/Loop/Loop/Managers/LoopAppManager.swift
+index 47f1b67..e566aa9 100644
+--- a/Loop/Loop/Managers/LoopAppManager.swift
++++ b/Loop/Loop/Managers/LoopAppManager.swift
+@@ -953,6 +953,8 @@ extension LoopAppManager: UNUserNotificationCenterDelegate {
+ 
+     nonisolated func userNotificationCenter(_ center: UNUserNotificationCenter, willPresent notification: UNNotification, withCompletionHandler completionHandler: @escaping (UNNotificationPresentationOptions) -> Void) {
+         switch notification.request.identifier {
++        case GlucoseIconBadge.expirationIdentifier:
++            completionHandler([.badge])
+         // TODO: Until these notifications are converted to use the new alert system, they shall still show in the foreground
+         case LoopNotificationCategory.bolusFailure.rawValue,
+              LoopNotificationCategory.pumpBatteryLow.rawValue,
+diff --git a/Loop/Loop/Views/SettingsView.swift b/Loop/Loop/Views/SettingsView.swift
+index 05ec4ef..10c9757 100644
+--- a/Loop/Loop/Views/SettingsView.swift
++++ b/Loop/Loop/Views/SettingsView.swift
+@@ -322,7 +322,7 @@ extension SettingsView {
+                 )
+                 .accessibilityIdentifier("settingsViewLiveActivity")
+             }
+-            NavigationLink(destination: DisplaySettingsView(contact: viewModel.deviceManager?.glucoseContact)) {
++            NavigationLink(destination: DisplaySettingsView(contact: viewModel.deviceManager?.glucoseContact, badge: viewModel.deviceManager?.glucoseIconBadge)) {
+                 LargeButton(
+                     action: {},
+                     includeArrow: false,
+@@ -877,6 +877,7 @@ enum DisplayPreference {
+ 
+ struct DisplaySettingsView: View {
+     var contact: GlucoseContact?
++    var badge: GlucoseIconBadge?
+     @AppStorage(DisplayPreference.nowLine) private var nowLine = false
+     @AppStorage(DisplayPreference.fixedGlucoseScale) private var fixedGlucoseScale = false
+     @AppStorage(DisplayPreference.historyHours) private var historyHours = 0
+@@ -890,6 +891,7 @@ struct DisplaySettingsView: View {
+ 
+     var body: some View {
+         List {
++            if let badge { GlucoseIconBadgeSettings(badge: badge) }
+             if let contact { GlucoseContactSettings(contact: contact) }
+             Section(footer: Text("A vertical line marking the current time on each chart.")) {
+                 Toggle("Now Line", isOn: $nowLine)
