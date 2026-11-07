@@ -1,0 +1,329 @@
+diff --git a/Loop/Loop.xcodeproj/project.pbxproj b/Loop/Loop.xcodeproj/project.pbxproj
+index 904eecb..a3099a4 100644
+--- a/Loop/Loop.xcodeproj/project.pbxproj
++++ b/Loop/Loop.xcodeproj/project.pbxproj
+@@ -271,6 +271,7 @@
+ 		43D9FFD721EAE05D00AF44BF /* LoopCore.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 43D9FFCF21EAE05D00AF44BF /* LoopCore.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+ 		43D9FFFB21EAF3D300AF44BF /* NSTimeInterval.swift in Sources */ = {isa = PBXBuildFile; fileRef = 439897341CD2F7DE00223065 /* NSTimeInterval.swift */; };
+ 		43DBF0531C93EC8200B3C386 /* DeviceDataManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 43DBF0521C93EC8200B3C386 /* DeviceDataManager.swift */; };
++		C017AC700000000000000002 /* GlucoseContact.swift in Sources */ = {isa = PBXBuildFile; fileRef = C017AC700000000000000001 /* GlucoseContact.swift */; };
+ 		43DFB62320D4CAE7008A7BAE /* PumpManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 43C3B6F620BBCAA30026CAFA /* PumpManager.swift */; };
+ 		43E3449F1B9D68E900C85C07 /* StatusTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 43E3449E1B9D68E900C85C07 /* StatusTableViewController.swift */; };
+ 		43E93FB61E469A4000EAB8DB /* NumberFormatter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 43BFF0B31E45C1BE00FF19A9 /* NumberFormatter.swift */; };
+@@ -1091,6 +1092,7 @@
+ 		43D9FFD121EAE05D00AF44BF /* LoopCore.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = LoopCore.h; sourceTree = "<group>"; };
+ 		43D9FFD221EAE05D00AF44BF /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+ 		43DBF0521C93EC8200B3C386 /* DeviceDataManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; lineEnding = 0; path = DeviceDataManager.swift; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.swift; };
++		C017AC700000000000000001 /* GlucoseContact.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; lineEnding = 0; path = GlucoseContact.swift; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.swift; };
+ 		43DE92581C5479E4001FFDE1 /* GetBolusRecommendationUserInfo.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = GetBolusRecommendationUserInfo.swift; sourceTree = "<group>"; };
+ 		43E2D90B1D20C581004DA55F /* LoopTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = LoopTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+ 		43E2D90F1D20C581004DA55F /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+@@ -2289,6 +2291,7 @@
+ 				A977A2F324ACFECF0059C207 /* CriticalEventLogExportManager.swift */,
+ 				C148CEE624FD91BD00711B3B /* DeliveryUncertaintyAlertManager.swift */,
+ 				43DBF0521C93EC8200B3C386 /* DeviceDataManager.swift */,
++				C017AC700000000000000001 /* GlucoseContact.swift */,
+ 				C16B983D26B4893300256B05 /* DoseEnactor.swift */,
+ 				4F70C20F1DE8FAC5006380B7 /* ExtensionDataManager.swift */,
+ 				A9C62D862331703000535612 /* LoggingServicesManager.swift */,
+@@ -3786,6 +3789,7 @@
+ 				A9CBE45A248ACBE1008E7BA2 /* DosingDecisionStore+SimulatedCoreData.swift in Sources */,
+ 				A9C62D8A2331703100535612 /* ServicesManager.swift in Sources */,
+ 				43DBF0531C93EC8200B3C386 /* DeviceDataManager.swift in Sources */,
++				C017AC700000000000000002 /* GlucoseContact.swift in Sources */,
+ 				A9347F2F24E7508A00C99C34 /* WatchHistoricalCarbs.swift in Sources */,
+ 				C10509792D8B636900118A37 /* Environment+TemporaryPresetsManager.swift in Sources */,
+ 				C17824A01E19CF9800D9D25C /* GlucoseThresholdTableViewController.swift in Sources */,
+diff --git a/Loop/Loop/Info.plist b/Loop/Loop/Info.plist
+index ee01b7f..1372ab6 100644
+--- a/Loop/Loop/Info.plist
++++ b/Loop/Loop/Info.plist
+@@ -2,6 +2,8 @@
+ <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+ <plist version="1.0">
+ <dict>
++	<key>NSContactsUsageDescription</key>
++	<string>Loop uses Contacts to display glucose readings on a dedicated Loop contact when you enable its photo.</string>
+ 	<key>AppGroupIdentifier</key>
+ 	<string>$(APP_GROUP_IDENTIFIER)</string>
+ 	<key>AppStoreURL</key>
+diff --git a/Loop/Loop/Managers/DeviceDataManager.swift b/Loop/Loop/Managers/DeviceDataManager.swift
+index 19db482..f11526f 100644
+--- a/Loop/Loop/Managers/DeviceDataManager.swift
++++ b/Loop/Loop/Managers/DeviceDataManager.swift
+@@ -6,6 +6,7 @@
+ //  Copyright Â© 2015 Nathan Racklyeft. All rights reserved.
+ //
+ 
++import UIKit
+ import HealthKit
+ @preconcurrency import LoopKit
+ import LoopKitUI
+@@ -172,6 +173,7 @@ final class DeviceDataManager {
+     // MARK: Stores
+     let carbStore: CarbStore
+     let doseStore: DoseStore
++    let glucoseContact = GlucoseContact()
+     let glucoseStore: GlucoseStore
+     
+     private let healthStore: HKHealthStore
+@@ -311,6 +313,15 @@ final class DeviceDataManager {
+             await cgmStalenessMonitor.checkCGMStaleness()
+         }
+ 
++        glucoseContact.deviceManager = self
++        displayGlucosePreference.$formatter
++            .map { _ in () }
++            .merge(with: NotificationCenter.default.publisher(for: UIApplication.didBecomeActiveNotification).map { _ in () })
++            .merge(with: NotificationCenter.default.publisher(for: GlucoseStore.glucoseSamplesDidChange).map { _ in () })
++            .receive(on: DispatchQueue.main)
++            .sink { [weak self] in self?.glucoseContact.refresh() }
++            .store(in: &cancellables)
++
+         setupPump()
+         setupCGM()
+     }
+diff --git a/Loop/Loop/Managers/GlucoseContact.swift b/Loop/Loop/Managers/GlucoseContact.swift
+new file mode 100644
+index 0000000..4358f60
+--- /dev/null
++++ b/Loop/Loop/Managers/GlucoseContact.swift
+@@ -0,0 +1,209 @@
++import Combine
++import Contacts
++import LoopKit
++import SwiftUI
++import UIKit
++
++/// Updates a dedicated contact so the system Contacts widget and watch complication can show Loop readings.
++@MainActor
++final class GlucoseContact: ObservableObject {
++    private enum Key {
++        static let enabled = "GlucoseContact.enabled"
++        static let trend = "GlucoseContact.trend"
++        static let contrast = "GlucoseContact.contrast"
++        static let identifier = "GlucoseContact.identifier"
++        static let needsOffImage = "GlucoseContact.needsOffImage"
++    }
++
++    @Published private(set) var enabled = UserDefaults.standard.bool(forKey: Key.enabled)
++    @Published private(set) var requestingAccess = false
++    @Published private(set) var message: String?
++    @Published var trend = UserDefaults.standard.object(forKey: Key.trend) as? Bool ?? true {
++        didSet { UserDefaults.standard.set(trend, forKey: Key.trend); refresh() }
++    }
++    @Published var contrast = UserDefaults.standard.bool(forKey: Key.contrast) {
++        didSet { UserDefaults.standard.set(contrast, forKey: Key.contrast); refresh() }
++    }
++
++    weak var deviceManager: DeviceDataManager?
++    private var expiration: Task<Void, Never>?
++    private let writes = DispatchQueue(label: "com.loopkit.glucoseContact")
++    private var revision = 0
++
++    func setEnabled(_ value: Bool) {
++        guard !requestingAccess else { return }
++        if value && CNContactStore.authorizationStatus(for: .contacts) == .notDetermined {
++            requestingAccess = true
++            Task {
++                do {
++                    let granted = try await CNContactStore().requestAccess(for: .contacts)
++                    requestingAccess = false
++                    if granted { setEnabled(true) } else { message = Self.permissionMessage }
++                } catch {
++                    requestingAccess = false
++                    message = error.localizedDescription
++                }
++            }
++            return
++        }
++        guard !value || Self.hasAccess else {
++            message = Self.permissionMessage
++            return
++        }
++        enabled = value
++        UserDefaults.standard.set(value, forKey: Key.enabled)
++        UserDefaults.standard.set(!value, forKey: Key.needsOffImage)
++        refresh()
++    }
++
++    private static var permissionMessage: String {
++        NSLocalizedString("Allow Loop to access Contacts in iOS Settings to update the contact photo.", comment: "Contacts permission help")
++    }
++
++    private static var hasAccess: Bool {
++        let status = CNContactStore.authorizationStatus(for: .contacts)
++        if #available(iOS 18, *), status == .limited { return true }
++        return status == .authorized
++    }
++
++    func refresh() {
++        expiration?.cancel()
++        revision += 1
++        guard enabled || UserDefaults.standard.bool(forKey: Key.needsOffImage), let deviceManager else { return }
++        guard Self.hasAccess else {
++            message = Self.permissionMessage
++            return
++        }
++
++        let sample = enabled ? deviceManager.glucoseStore.latestGlucose : nil
++        let deadline = sample?.startDate.addingTimeInterval(7 * 60)
++        let now = Date()
++        let fresh = sample.map { $0.startDate <= now } == true && deadline.map { now < $0 } == true
++        if fresh, let deadline {
++            expiration = Task { [weak self] in
++                try? await Task.sleep(for: .seconds(deadline.timeIntervalSince(now)))
++                guard !Task.isCancelled else { return }
++                self?.refresh()
++            }
++        }
++        let value = sample.map { reading -> String in
++            switch reading.condition {
++            case .belowRange: return "LOW"
++            case .aboveRange: return "HIGH"
++            case nil: return deviceManager.displayGlucosePreference.format(reading.quantity, includeUnit: false)
++            }
++        } ?? (enabled ? "â€”" : "OFF")
++        let range = deviceManager.glucoseDisplay(for: sample)?.glucoseRangeCategory
++        let color: Color
++        if !fresh { color = .gray }
++        else if contrast { color = .white }
++        else {
++            switch range {
++            case .belowRange, .urgentLow, .aboveRange: color = .red
++            case .low, .high: color = .yellow
++            case .normal: color = .green
++            case nil: color = .white
++            }
++        }
++        let arrow = fresh && trend ? (sample as? StoredGlucoseSample)?.trend?.symbol : nil
++        let timestamp = sample?.startDate.formatted(date: .omitted, time: .shortened)
++        let renderer = ImageRenderer(content: GlucoseContactPhoto(value: value, arrow: arrow, timestamp: timestamp, color: color))
++        guard let data = renderer.uiImage?.pngData() else { return }
++        let source = deviceManager.cgmManager?.localizedTitle ?? "Loop"
++        let detail = timestamp.map { "\(source) Â· \($0)" } ?? ""
++        let active = enabled
++        let currentRevision = revision
++        writes.async {
++            do {
++                try Self.save(data, detail: detail, active: active)
++                Task { @MainActor in
++                    guard currentRevision == self.revision else { return }
++                    self.message = nil
++                    if !active { UserDefaults.standard.removeObject(forKey: Key.needsOffImage) }
++                }
++            } catch {
++                Task { @MainActor in
++                    guard currentRevision == self.revision else { return }
++                    self.message = error.localizedDescription
++                }
++            }
++        }
++    }
++
++    nonisolated private static func save(_ image: Data, detail: String, active: Bool) throws {
++        let store = CNContactStore()
++        let request = CNSaveRequest()
++        let contact: CNMutableContact
++        if let id = UserDefaults.standard.string(forKey: Key.identifier) {
++            // A partial name match could point at someone else's address book entry.
++            // Recreate a deleted contact only when full access confirms it is missing.
++            let matches = try store.unifiedContacts(matching: CNContact.predicateForContacts(withIdentifiers: [id]),
++                                                    keysToFetch: [CNContactImageDataKey, CNContactOrganizationNameKey] as [CNKeyDescriptor])
++            if let existing = matches.first {
++                guard existing.imageData != image || existing.organizationName != detail else { return }
++                guard let editable = existing.mutableCopy() as? CNMutableContact else { return }
++                contact = editable
++                request.update(contact)
++            } else {
++                guard active else { return }
++                guard CNContactStore.authorizationStatus(for: .contacts) == .authorized else {
++                    throw NSError(domain: CNErrorDomain, code: CNError.Code.authorizationDenied.rawValue)
++                }
++                contact = CNMutableContact()
++                contact.givenName = "Loop"
++                request.add(contact, toContainerWithIdentifier: nil)
++            }
++        } else {
++            guard active else { return }
++            contact = CNMutableContact()
++            contact.givenName = "Loop"
++            request.add(contact, toContainerWithIdentifier: nil)
++        }
++        contact.organizationName = detail
++        contact.imageData = image
++        try store.execute(request)
++        UserDefaults.standard.set(contact.identifier, forKey: Key.identifier)
++    }
++}
++
++private struct GlucoseContactPhoto: View {
++    let value: String
++    let arrow: String?
++    let timestamp: String?
++    let color: Color
++
++    var body: some View {
++        ZStack {
++            Color.black
++            VStack(spacing: 0) {
++                Text(value).font(.system(size: arrow == nil ? 104 : 86, weight: .bold))
++                if let arrow { Text(arrow).font(.system(size: 54, weight: .bold)) }
++                if let timestamp {
++                    Text(timestamp).font(.system(size: 34, weight: .semibold)).monospacedDigit()
++                        .frame(maxWidth: 160)
++                }
++            }
++            .foregroundStyle(color)
++            .lineLimit(1)
++            .minimumScaleFactor(0.55)
++            .frame(width: 212)
++        }
++        .frame(width: 256, height: 256)
++    }
++}
++
++struct GlucoseContactSettings: View {
++    @ObservedObject var contact: GlucoseContact
++
++    var body: some View {
++        Section(header: Text("Glucose Contact Photo"), footer: Text("Loop creates a contact named Loop. Choose it in a Contacts widget or watch complication. The time on the photo is the reading time. Contacts can sync through your address book account.")) {
++            Toggle("Update Contact Photo", isOn: Binding(get: { contact.enabled }, set: contact.setEnabled))
++                .disabled(contact.requestingAccess)
++            if contact.enabled {
++                Toggle("Show Trend Arrow", isOn: $contact.trend)
++                Toggle("High Contrast", isOn: $contact.contrast)
++            }
++            if let message = contact.message { Text(message).font(.footnote) }
++        }
++    }
++}
+diff --git a/Loop/Loop/Views/SettingsView.swift b/Loop/Loop/Views/SettingsView.swift
+index 70f6d26..05ec4ef 100644
+--- a/Loop/Loop/Views/SettingsView.swift
++++ b/Loop/Loop/Views/SettingsView.swift
+@@ -322,7 +322,7 @@ extension SettingsView {
+                 )
+                 .accessibilityIdentifier("settingsViewLiveActivity")
+             }
+-            NavigationLink(destination: DisplaySettingsView()) {
++            NavigationLink(destination: DisplaySettingsView(contact: viewModel.deviceManager?.glucoseContact)) {
+                 LargeButton(
+                     action: {},
+                     includeArrow: false,
+@@ -876,6 +876,7 @@ enum DisplayPreference {
+ }
+ 
+ struct DisplaySettingsView: View {
++    var contact: GlucoseContact?
+     @AppStorage(DisplayPreference.nowLine) private var nowLine = false
+     @AppStorage(DisplayPreference.fixedGlucoseScale) private var fixedGlucoseScale = false
+     @AppStorage(DisplayPreference.historyHours) private var historyHours = 0
+@@ -889,6 +890,7 @@ struct DisplaySettingsView: View {
+ 
+     var body: some View {
+         List {
++            if let contact { GlucoseContactSettings(contact: contact) }
+             Section(footer: Text("A vertical line marking the current time on each chart.")) {
+                 Toggle("Now Line", isOn: $nowLine)
+             }
