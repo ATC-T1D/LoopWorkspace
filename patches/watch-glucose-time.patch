@@ -1,0 +1,14 @@
+diff --git a/Loop/Loop Widget Extension/Live Activity/GlucoseLiveActivityConfiguration.swift b/Loop/Loop Widget Extension/Live Activity/GlucoseLiveActivityConfiguration.swift
+--- a/Loop/Loop Widget Extension/Live Activity/GlucoseLiveActivityConfiguration.swift
++++ b/Loop/Loop Widget Extension/Live Activity/GlucoseLiveActivityConfiguration.swift
+@@ -224,6 +224,10 @@
+                     Text(currentBG)
+                         .font(.headline)
+                         .foregroundStyle(glucoseColor)
++                    Text(context.state.date, style: .time)
++                        .font(.caption2)
++                        .foregroundStyle(Color(white: 0.7))
++                        .lineLimit(1)
+                     Text(context.state.delta + " " + unit)
+                         .font(.caption2)
+                         .foregroundStyle(Color(white: 0.7))
