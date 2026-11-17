@@ -65,8 +65,8 @@ index 19db482..f11526f 100644
      let doseStore: DoseStore
 +    let glucoseContact = GlucoseContact()
      let glucoseStore: GlucoseStore
-     
-     private let healthStore: HKHealthStore
+     let doseMetadataStore: DoseMetadataStore
+ 
 @@ -311,6 +313,15 @@ final class DeviceDataManager {
              await cgmStalenessMonitor.checkCGMStaleness()
          }
@@ -88,9 +88,10 @@ new file mode 100644
 index 0000000..4358f60
 --- /dev/null
 +++ b/Loop/Loop/Managers/GlucoseContact.swift
-@@ -0,0 +1,209 @@
+@@ -0,0 +1,213 @@
 +import Combine
 +import Contacts
++import HealthKit
 +import LoopKit
 +import SwiftUI
 +import UIKit
@@ -184,18 +185,21 @@ index 0000000..4358f60
 +            case nil: return deviceManager.displayGlucosePreference.format(reading.quantity, includeUnit: false)
 +            }
 +        } ?? (enabled ? "—" : "OFF")
-+        let range = deviceManager.glucoseDisplay(for: sample)?.glucoseRangeCategory
 +        let color: Color
 +        if !fresh { color = .gray }
 +        else if contrast { color = .white }
-+        else {
-+            switch range {
-+            case .belowRange, .urgentLow, .aboveRange: color = .red
-+            case .low, .high: color = .yellow
-+            case .normal: color = .green
-+            case nil: color = .white
++        else if let sample {
++            // Use fixed mg/dL thresholds regardless of display units or target range.
++            switch sample.condition {
++            case .belowRange: color = .red
++            case .aboveRange: color = .yellow
++            case nil:
++                let glucose = sample.quantity.doubleValue(for: .milligramsPerDeciliter)
++                if glucose >= 180 { color = .yellow }
++                else if glucose >= 75 { color = .green }
++                else { color = .red }
 +            }
-+        }
++        } else { color = .white }
 +        let arrow = fresh && trend ? (sample as? StoredGlucoseSample)?.trend?.symbol : nil
 +        let timestamp = sample?.startDate.formatted(date: .omitted, time: .shortened)
 +        let renderer = ImageRenderer(content: GlucoseContactPhoto(value: value, arrow: arrow, timestamp: timestamp, color: color))

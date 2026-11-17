@@ -45,7 +45,7 @@ index f11526f..037b13e 100644
 +    let glucoseIconBadge = GlucoseIconBadge()
      let glucoseContact = GlucoseContact()
      let glucoseStore: GlucoseStore
-     
+     let doseMetadataStore: DoseMetadataStore
 @@ -313,13 +314,17 @@ final class DeviceDataManager {
              await cgmStalenessMonitor.checkCGMStaleness()
          }
